@@ -3,12 +3,18 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load the dataset
-df = pd.read_csv("./dataset.csv")
+df = pd.read_excel("./dataset.xlsx")
 
-# EDA
+"""EDA"""
 print(df.head())
 print(df.info())
-print(df.describe())
+
+print("Checking for missing values...")
 print(df.isnull().sum())
+
+print("Checking for duplicates:", end=" ")
 print(df.duplicated().sum())
-print(df.columns)
+print("Summarizing the data:")
+print(df.describe())
+print("Columns in the dataset:")
+print(df.columns.tolist())
