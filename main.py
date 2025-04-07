@@ -34,7 +34,7 @@ df[sales_columns] = df[sales_columns].fillna(0)
 # Dropping rows with missing values in 'critic_score'
 df_critic = df.dropna(subset=['critic_score'])
 
-# Extracting the year and month from 'relase_date'
+# Extracting the year and month from 'release_date'
 df['release_year'] = pd.to_datetime(df['release_date']).dt.year
 df['release_month'] = pd.to_datetime(df['release_date']).dt.month
 
@@ -67,6 +67,29 @@ plt.xticks(rotation=45)
 plt.title('Regional Sales by Gaming Platform')
 plt.xlabel('Gaming Platform')
 plt.ylabel('Sales (in millions)')
+plt.legend(title='Region')
+plt.show()
+
+# 2. Top Genres — Who loves what genre, and where?
+
+# Group by genre and calculate the sum of sales for each region
+genre_sales = df_ready.groupby('genre')[['na_sales', 'jp_sales', 'pal_sales', 'other_sales']].sum()
+
+# Sort the data by total sales (sum of all regions) in descending order
+genre_sales['total_sales'] = genre_sales.sum(axis=1)
+genre_sales = genre_sales.sort_values(by='total_sales', ascending=False)
+
+plt.figure(figsize=(12, 6))
+
+# Create a bar plot for each region
+sns.barplot(x=genre_sales.index, y=genre_sales['na_sales'], label='North America', color='blue', alpha=0.7)
+sns.barplot(x=genre_sales.index, y=genre_sales['jp_sales'], label='Japan', color='red', alpha=0.7, bottom=genre_sales['na_sales'])
+sns.barplot(x=genre_sales.index, y=genre_sales['pal_sales'], label='PAL', color='green', alpha=0.7, bottom=genre_sales['na_sales'] + genre_sales['jp_sales'])
+sns.barplot(x=genre_sales.index, y=genre_sales['other_sales'], label='Other', color='orange', alpha=0.7, bottom=genre_sales['na_sales'] + genre_sales['jp_sales'] + genre_sales['pal_sales'])
+
 plt.xticks(rotation=45)
+plt.title('Regional Sales by Genre')
+plt.xlabel('Genre')
+plt.ylabel('Sales (in millions)')
 plt.legend(title='Region')
 plt.show()
