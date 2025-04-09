@@ -63,9 +63,8 @@ outliers = (np.abs(z_scores) > threshold).any(axis=1)
 
 # Step 5: Count and show outliers
 print(f"Number of outliers found: {outliers.sum()}")
-print(df_z[outliers])
 
-# !1. Platform vs Region — Which platform performs better where?
+# !1. Platform vs Region — Which platform performs better where? by analyzing the sales data by platform and region.
 
 # List of popular consoles
 popular_consoles = ["PS", "PS2", "PS3", "PS4", "PS5", "XONE", "X360",
@@ -92,7 +91,7 @@ plt.ylabel('Sales (in millions)')
 plt.legend(title='Region')
 plt.show()
 
-# !2. Top Genres — Who loves what genre, and where?
+# !2. Top Genres — Who loves what genre, and where? by analyzing the sales data by genre and region.
 
 # Group by genre and calculate the sum of sales for each region
 genre_sales = df_ready.groupby('genre')[['na_sales', 'jp_sales', 'pal_sales', 'other_sales']].sum()
@@ -114,4 +113,32 @@ plt.title('Regional Sales by Genre')
 plt.xlabel('Genre')
 plt.ylabel('Sales (in millions)')
 plt.legend(title='Region')
+plt.show()
+
+
+# ! Objective 3: To determine which genres are most appealing to consumers and where by analyzing total and regional sales figures by game genre like Action, Shooter, Sports.
+
+# 1. Total Sales by Genre
+total_sales_by_genre = df.groupby("genre")["total_sales"].sum().sort_values(ascending=False)
+
+# 2. Regional Sales by Genre
+regional_sales_by_genre = df.groupby("genre")[["na_sales", "jp_sales", "pal_sales", "other_sales"]].sum()
+
+# Plotting Total Sales by Genre
+plt.figure(figsize=(12, 6))
+sns.barplot(x=total_sales_by_genre.values, y=total_sales_by_genre.index,hue=total_sales_by_genre.index, palette="viridis")
+plt.title("Total Global Sales by Genre")
+plt.xlabel("Total Sales (in millions)")
+plt.ylabel("Genre")
+plt.tight_layout()
+plt.show()
+
+# Plotting Regional Sales by Genre
+# Heatmap
+plt.figure(figsize=(10, 8))
+sns.heatmap(regional_sales_by_genre, annot=True, fmt=".1f", cmap="YlGnBu", linewidths=.5)
+plt.title("Regional Sales Heatmap by Genre")
+plt.xlabel("Region")
+plt.ylabel("Genre")
+plt.tight_layout()
 plt.show()
