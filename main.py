@@ -3,6 +3,7 @@
 Video Game Sales: Understanding the key factors that influence game sales across regions, platforms, genres, and time by analyzing critic scores, publisher impact, and release patterns to uncover trends that drive commercial success in the gaming industry.
 """
 
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -43,7 +44,28 @@ key_columns = ['title', 'console', 'genre', 'publisher', 'developer', 'critic_sc
 
 clean_df = df[key_columns]
 
-# 1. Platform vs Region — Which platform performs better where?
+df = df.head(1000).copy()
+
+#? Outlier Detection using z_score
+
+# Step 1: Select numeric columns for outlier detection
+numeric_cols = ['total_sales', 'na_sales', 'jp_sales', 'pal_sales', 'other_sales', 'critic_score']
+
+# Step 2: Drop rows with missing critic_score
+df_z = clean_df.dropna(subset=['critic_score'])
+
+# Step 3: Calculate z-scores manually
+z_scores = (df_z[numeric_cols] - df_z[numeric_cols].mean()) / df_z[numeric_cols].std()
+
+# Step 4: Set threshold and detect outliers
+threshold = 3
+outliers = (np.abs(z_scores) > threshold).any(axis=1)
+
+# Step 5: Count and show outliers
+print(f"Number of outliers found: {outliers.sum()}")
+print(df_z[outliers])
+
+# !1. Platform vs Region — Which platform performs better where?
 
 # List of popular consoles
 popular_consoles = ["PS", "PS2", "PS3", "PS4", "PS5", "XONE", "X360",
@@ -70,7 +92,7 @@ plt.ylabel('Sales (in millions)')
 plt.legend(title='Region')
 plt.show()
 
-# 2. Top Genres — Who loves what genre, and where?
+# !2. Top Genres — Who loves what genre, and where?
 
 # Group by genre and calculate the sum of sales for each region
 genre_sales = df_ready.groupby('genre')[['na_sales', 'jp_sales', 'pal_sales', 'other_sales']].sum()
