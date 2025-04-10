@@ -6,7 +6,7 @@ Video Game Sales: Understanding the key factors that influence game sales across
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
+import seaborn as sb
 
 # Load the dataset
 df = pd.read_excel("./dataset.xlsx")
@@ -79,10 +79,10 @@ region_sales = df_ready.groupby('console')[['na_sales', 'jp_sales', 'pal_sales',
 plt.figure(figsize=(12, 6))
 
 # Create a bar plot for each region
-sns.barplot(x=region_sales.index, y=region_sales['na_sales'], label='North America', color='blue', alpha=0.7)
-sns.barplot(x=region_sales.index, y=region_sales['jp_sales'], label='Japan', color='red', alpha=0.7, bottom=region_sales['na_sales'])
-sns.barplot(x=region_sales.index, y=region_sales['pal_sales'], label='PAL', color='green', alpha=0.7, bottom=region_sales['na_sales'] + region_sales['jp_sales'])
-sns.barplot(x=region_sales.index, y=region_sales['other_sales'], label='Other', color='orange', alpha=0.7, bottom=region_sales['na_sales'] + region_sales['jp_sales'] + region_sales['pal_sales'])
+sb.barplot(x=region_sales.index, y=region_sales['na_sales'], label='North America', color='blue', alpha=0.7)
+sb.barplot(x=region_sales.index, y=region_sales['jp_sales'], label='Japan', color='red', alpha=0.7, bottom=region_sales['na_sales'])
+sb.barplot(x=region_sales.index, y=region_sales['pal_sales'], label='PAL', color='green', alpha=0.7, bottom=region_sales['na_sales'] + region_sales['jp_sales'])
+sb.barplot(x=region_sales.index, y=region_sales['other_sales'], label='Other', color='orange', alpha=0.7, bottom=region_sales['na_sales'] + region_sales['jp_sales'] + region_sales['pal_sales'])
 
 plt.xticks(rotation=45)
 plt.title('Regional Sales by Gaming Platform')
@@ -103,10 +103,10 @@ genre_sales = genre_sales.sort_values(by='total_sales', ascending=False)
 plt.figure(figsize=(12, 6))
 
 # Create a bar plot for each region
-sns.barplot(x=genre_sales.index, y=genre_sales['na_sales'], label='North America', color='blue', alpha=0.7)
-sns.barplot(x=genre_sales.index, y=genre_sales['jp_sales'], label='Japan', color='red', alpha=0.7, bottom=genre_sales['na_sales'])
-sns.barplot(x=genre_sales.index, y=genre_sales['pal_sales'], label='PAL', color='green', alpha=0.7, bottom=genre_sales['na_sales'] + genre_sales['jp_sales'])
-sns.barplot(x=genre_sales.index, y=genre_sales['other_sales'], label='Other', color='orange', alpha=0.7, bottom=genre_sales['na_sales'] + genre_sales['jp_sales'] + genre_sales['pal_sales'])
+sb.barplot(x=genre_sales.index, y=genre_sales['na_sales'], label='North America', color='blue', alpha=0.7)
+sb.barplot(x=genre_sales.index, y=genre_sales['jp_sales'], label='Japan', color='red', alpha=0.7, bottom=genre_sales['na_sales'])
+sb.barplot(x=genre_sales.index, y=genre_sales['pal_sales'], label='PAL', color='green', alpha=0.7, bottom=genre_sales['na_sales'] + genre_sales['jp_sales'])
+sb.barplot(x=genre_sales.index, y=genre_sales['other_sales'], label='Other', color='orange', alpha=0.7, bottom=genre_sales['na_sales'] + genre_sales['jp_sales'] + genre_sales['pal_sales'])
 
 plt.xticks(rotation=45)
 plt.title('Regional Sales by Genre')
@@ -126,7 +126,7 @@ regional_sales_by_genre = df.groupby("genre")[["na_sales", "jp_sales", "pal_sale
 
 # Plotting Total Sales by Genre
 plt.figure(figsize=(12, 6))
-sns.barplot(x=total_sales_by_genre.values, y=total_sales_by_genre.index,hue=total_sales_by_genre.index, palette="viridis")
+sb.barplot(x=total_sales_by_genre.values, y=total_sales_by_genre.index, hue=total_sales_by_genre.index, palette="viridis")
 plt.title("Total Global Sales by Genre")
 plt.xlabel("Total Sales (in millions)")
 plt.ylabel("Genre")
@@ -136,7 +136,7 @@ plt.show()
 # Plotting Regional Sales by Genre
 # Heatmap
 plt.figure(figsize=(10, 8))
-sns.heatmap(regional_sales_by_genre, annot=True, fmt=".1f", cmap="YlGnBu", linewidths=.5)
+sb.heatmap(regional_sales_by_genre, annot=True, fmt=".1f", cmap="YlGnBu", linewidths=.5)
 plt.title("Regional Sales Heatmap by Genre")
 plt.xlabel("Region")
 plt.ylabel("Genre")
@@ -153,13 +153,13 @@ top_publishers_score = (
     publisher_scores.groupby("publisher")["critic_score"]
     .mean()
     .sort_values(ascending=False)
-    .head(10)
+    .head(15)
 )
 
 # Plot
 plt.figure(figsize=(10, 6))
-sns.barplot(x=top_publishers_score.values, y=top_publishers_score.index, palette="coolwarm")
-plt.title("Top 10 Publishers by Average Critic Score")
+sb.barplot(x=top_publishers_score.values, y=top_publishers_score.index, hue=top_publishers_score.index, palette="coolwarm")
+plt.title("Top 15 Publishers by Average Critic Score")
 plt.xlabel("Average Critic Score")
 plt.ylabel("Publisher")
 plt.xlim(0, 10)
@@ -170,14 +170,28 @@ developer_sales = (
     df.groupby("developer")["total_sales"]
     .mean()
     .sort_values(ascending=False)
-    .head(10)
+    .head(15)
 )
 
 # Plot
 plt.figure(figsize=(10, 6))
-sns.barplot(x=developer_sales.values, y=developer_sales.index, palette="viridis")
-plt.title("Top 10 Developers by Average Total Sales")
+sb.barplot(x=developer_sales.values, y=developer_sales.index, hue=developer_sales.index, palette="viridis")
+plt.title("Top 15 Developers by Average Total Sales")
 plt.xlabel("Average Total Sales (in millions)")
 plt.ylabel("Developer")
+plt.tight_layout()
+plt.show()
+
+# ! Objective 4: To determine whether higher critic scores are associated with higher total sales, and assess the extent to which critical reception influences a game's commercial success compared to other potential factors.
+
+df["score_range"] = pd.cut(df["critic_score"], bins=[0, 5, 6, 7, 8, 9, 10], labels=["0-5", "5-6", "6-7", "7-8", "8-9", "9-10"])
+
+# Bar plot of average total sales by score range
+plt.figure(figsize=(10, 6))
+sb.barplot(data=df[df["score_range"].notnull() & df["total_sales"].notnull()],
+            x="score_range", y="total_sales", hue="score_range", palette="magma")
+plt.title("Average Sales by Critic Score Range")
+plt.xlabel("Critic Score Range")
+plt.ylabel("Average Total Sales (in millions)")
 plt.tight_layout()
 plt.show()
