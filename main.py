@@ -64,7 +64,7 @@ outliers = (np.abs(z_scores) > threshold).any(axis=1)
 # Step 5: Count and show outliers
 print(f"Number of outliers found: {outliers.sum()}")
 
-# !1. Platform vs Region — Which platform performs better where? by analyzing the sales data by platform and region.
+# ! Objective 1. Platform vs Region — Which platform performs better where? by analyzing the sales data by platform and region.
 
 # List of popular consoles
 popular_consoles = ["PS", "PS2", "PS3", "PS4", "PS5", "XONE", "X360",
@@ -91,7 +91,7 @@ plt.ylabel('Sales (in millions)')
 plt.legend(title='Region')
 plt.show()
 
-# !2. Top Genres — Who loves what genre, and where? by analyzing the sales data by genre and region.
+# ! Objective 2: Top Genres — Who loves what genre, and where? by analyzing the sales data by genre and region.
 
 # Group by genre and calculate the sum of sales for each region
 genre_sales = df_ready.groupby('genre')[['na_sales', 'jp_sales', 'pal_sales', 'other_sales']].sum()
@@ -116,7 +116,7 @@ plt.legend(title='Region')
 plt.show()
 
 
-# ! Objective 3: To determine which genres are most appealing to consumers and where by analyzing total and regional sales figures by game genre like Action, Shooter, Sports.
+# ! To determine which genres are most appealing to consumers and where by analyzing total and regional sales figures by game genre like Action, Shooter, Sports.
 
 # 1. Total Sales by Genre
 total_sales_by_genre = df.groupby("genre")["total_sales"].sum().sort_values(ascending=False)
@@ -140,5 +140,44 @@ sns.heatmap(regional_sales_by_genre, annot=True, fmt=".1f", cmap="YlGnBu", linew
 plt.title("Regional Sales Heatmap by Genre")
 plt.xlabel("Region")
 plt.ylabel("Genre")
+plt.tight_layout()
+plt.show()
+
+# ! Objective 3: To check how game makers and publishers affect game sales and ratings
+
+# Filter for non-null critic scores
+publisher_scores = df[df["critic_score"].notnull()]
+
+# Group and average
+top_publishers_score = (
+    publisher_scores.groupby("publisher")["critic_score"]
+    .mean()
+    .sort_values(ascending=False)
+    .head(10)
+)
+
+# Plot
+plt.figure(figsize=(10, 6))
+sns.barplot(x=top_publishers_score.values, y=top_publishers_score.index, palette="coolwarm")
+plt.title("Top 10 Publishers by Average Critic Score")
+plt.xlabel("Average Critic Score")
+plt.ylabel("Publisher")
+plt.xlim(0, 10)
+plt.tight_layout()
+plt.show()
+
+developer_sales = (
+    df.groupby("developer")["total_sales"]
+    .mean()
+    .sort_values(ascending=False)
+    .head(10)
+)
+
+# Plot
+plt.figure(figsize=(10, 6))
+sns.barplot(x=developer_sales.values, y=developer_sales.index, palette="viridis")
+plt.title("Top 10 Developers by Average Total Sales")
+plt.xlabel("Average Total Sales (in millions)")
+plt.ylabel("Developer")
 plt.tight_layout()
 plt.show()
