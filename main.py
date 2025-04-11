@@ -204,3 +204,18 @@ plt.xlabel("Critic Score Range")
 plt.ylabel("Average Total Sales (in millions)")
 plt.tight_layout()
 plt.show()
+
+# ! Objective 5
+# Ensure release_date is in datetime format
+if not pd.api.types.is_datetime64_any_dtype(df['release_date']):
+	df['release_date'] = pd.to_datetime(df['release_date'], origin='1899-12-30', unit='D')
+
+yearly_sales = df.groupby('release_year')['total_sales'].sum()
+plt.figure(figsize=(12, 6))
+sb.lineplot(x=yearly_sales.index, y=yearly_sales.values, marker='o', color='purple')
+plt.title('Total Sales by Release Year')
+plt.xlabel('Release Year')
+plt.ylabel('Total Sales (in millions)')
+plt.grid(True)
+plt.tight_layout()
+plt.show()
