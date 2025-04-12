@@ -4,7 +4,7 @@
 
 Understanding the key factors that influence video game sales across regions, platforms, genres, and time by analyzing critic scores, publisher impact, and release patterns to uncover trends that drive commercial success in the gaming industry.
 
-For better visualizations check out the jupyter notebook here [Jupyter Notebook](https://github.com/aditya-2k23/python-CA2/blob/main/jupyter-analysis.ipynb) 
+For better visualizations check out the jupyter notebook here [Jupyter Notebook](https://www.github.com/aditya-2k23/python-CA2/blob/main/jupyter-analysis.ipynb) 
 
 ## 📊 Objectives
 
