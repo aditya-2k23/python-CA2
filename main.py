@@ -1,6 +1,6 @@
 # Problem statement
 """
-Video Game Sales: Understanding the key factors that influence game sales across regions, platforms, genres, and time by analyzing critic scores, publisher impact, and release patterns to uncover trends that drive commercial success in the gaming industry.
+Video Game Sales: Understanding the key factors that influence game sales across regions, platforms, genres, and time by analyzing critic scores, publisher impact, and release patterns to understand the trends that drive commercial success in the gaming industry.
 """
 
 import numpy as np
@@ -39,7 +39,7 @@ key_columns = ['title', 'console', 'genre', 'publisher', 'developer', 'critic_sc
 
 clean_df = df[key_columns]
 
-df = clean_df.head(10000).copy()
+df = clean_df.head(10000)
 
 # ? Outlier Detection using z_score
 # Select numeric columns for outlier detection
@@ -96,7 +96,7 @@ plt.show()
 # ! Objective 2: Top Genres — Who loves what genre, and where? by analyzing the sales data by genre and region.
 
 # Popular Genres
-popular_genres = ["Action", "Shooter", "Sports", "Role-Playing", "Adventure", "Platform", "Puzzle", "Simulation", "Strategy", "Racing", "Misc", "Fighting", "Platform", "Action-Adventure", "Strategy", "Music"]
+popular_genres = ["Action", "Shooter", "Sports", "Role-Playing", "Adventure", "Platform", "Simulation", "Platform", "Racing", "Misc", "Fighting"]
 
 # Group by genre and calculate the sum of sales for each region
 data = df[df['genre'].isin(popular_genres)]
@@ -104,23 +104,30 @@ genre_sales = data.groupby('genre')[['na_sales', 'jp_sales', 'pal_sales', 'other
 
 # Sort the data by total sales (sum of all regions) in descending order
 genre_sales['total_sales'] = genre_sales.sum(axis=1)
-genre_sales = genre_sales.sort_values(by='total_sales', ascending=False)
+genre_sales = genre_sales.sort_values(by='total_sales', ascending=False).head(15)  # Top 15 genres
 
-plt.figure(figsize=(12, 6))
+# Grouped bar chart for easier comparison between regions
+plt.figure(figsize=(14, 8))
+genre_sales = genre_sales.reset_index().melt(
+    id_vars=['genre', 'total_sales'],
+    value_vars=['na_sales', 'jp_sales', 'pal_sales', 'other_sales'],
+    var_name='region', value_name='sales'
+)
+genre_sales['region'] = genre_sales['region'].map({
+    'na_sales': 'North America',
+    'jp_sales': 'Japan',
+    'pal_sales': 'Europe/PAL',
+    'other_sales': 'Other Regions'
+})
 
-# Create a bar plot for each region
-sb.barplot(x=genre_sales.index, y=genre_sales['na_sales'], label='North America', color='blue', alpha=0.7)
-sb.barplot(x=genre_sales.index, y=genre_sales['jp_sales'], label='Japan', color='red', alpha=0.7, bottom=genre_sales['na_sales'])
-sb.barplot(x=genre_sales.index, y=genre_sales['pal_sales'], label='PAL', color='green', alpha=0.7, bottom=genre_sales['na_sales'] + genre_sales['jp_sales'])
-sb.barplot(x=genre_sales.index, y=genre_sales['other_sales'], label='Other', color='orange', alpha=0.7, bottom=genre_sales['na_sales'] + genre_sales['jp_sales'] + genre_sales['pal_sales'])
-
-plt.xticks(rotation=45)
-plt.title('Regional Sales by Genre')
+sb.barplot(x='genre', y='sales', hue='region', data=genre_sales, palette='viridis')
+plt.title('Regional Sales Comparison by Genre')
 plt.xlabel('Genre')
 plt.ylabel('Sales (in millions)')
+plt.xticks(rotation=45)
 plt.legend(title='Region')
+plt.tight_layout()
 plt.show()
-
 
 # ! To determine which genres are most appealing to consumers and where by analyzing total and regional sales figures by game genre like Action, Shooter, Sports.
 
@@ -141,7 +148,6 @@ plt.tight_layout()
 plt.show()
 
 # Plotting Regional Sales by Genre
-# Heatmap
 plt.figure(figsize=(10, 8))
 sb.heatmap(regional_sales_by_genre, annot=True, fmt=".1f", cmap="YlGnBu", linewidths=.5)
 plt.title("Regional Sales Heatmap by Genre")
@@ -150,27 +156,7 @@ plt.ylabel("Genre")
 plt.tight_layout()
 plt.show()
 
-# ! Objective 3: To check how game makers and publishers affect game sales and ratings
-
-# Filter for non-null critic scores
-publisher_scores = df[df["critic_score"].notnull()]
-
-# Group and average
-top_publishers_score = (
-    publisher_scores.groupby("publisher")["critic_score"]
-    .mean()
-    .sort_values(ascending=False)
-    .head(15)
-)
-
-plt.figure(figsize=(10, 6))
-sb.barplot(x=top_publishers_score.values, y=top_publishers_score.index, hue=top_publishers_score.index, palette="coolwarm")
-plt.title("Top 15 Publishers by Average Critic Score")
-plt.xlabel("Average Critic Score")
-plt.ylabel("Publisher")
-plt.xlim(0, 10)
-plt.tight_layout()
-plt.show()
+# ! Objective 3: To check how developers affect game sales and ratings
 
 developer_sales = (
     df.groupby("developer")["total_sales"]
@@ -193,14 +179,14 @@ df["score_range"] = pd.cut(df["critic_score"], bins=[0, 5, 6, 7, 8, 9, 10], labe
 
 plt.figure(figsize=(10, 6))
 sb.barplot(data=df[df["score_range"].notnull() & df["total_sales"].notnull()],
-            x="score_range", y="total_sales", hue="score_range", palette="magma")
+            x="score_range", y="total_sales", palette="magma", errorbar=None)
 plt.title("Average Sales by Critic Score Range")
 plt.xlabel("Critic Score Range")
 plt.ylabel("Average Total Sales (in millions)")
 plt.tight_layout()
 plt.show()
 
-# ! Objective 5
+# ! Objective 5: To check how the release date affects game sales
 df['release_date'] = pd.to_datetime(df['release_date'])
 
 yearly_sales = df.groupby('release_year')['total_sales'].sum()
