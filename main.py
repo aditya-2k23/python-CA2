@@ -31,8 +31,6 @@ df = df.drop(columns=['last_update'])
 sales_columns = ['total_sales', 'na_sales', 'jp_sales', 'pal_sales', 'other_sales']
 df[sales_columns] = df[sales_columns].fillna(0)
 
-df_critic = df.dropna(subset=['critic_score'])
-
 df['release_year'] = pd.to_datetime(df['release_date']).dt.year
 df['release_month'] = pd.to_datetime(df['release_date']).dt.month
 
@@ -41,7 +39,7 @@ key_columns = ['title', 'console', 'genre', 'publisher', 'developer', 'critic_sc
 
 clean_df = df[key_columns]
 
-df = clean_df.head(5000).copy()
+df = clean_df.head(10000).copy()
 
 # ? Outlier Detection using z_score
 # Select numeric columns for outlier detection
@@ -126,11 +124,11 @@ plt.show()
 
 # ! To determine which genres are most appealing to consumers and where by analyzing total and regional sales figures by game genre like Action, Shooter, Sports.
 
-# 1. Total Sales by Genre
+# Total Sales by Genre
 data = df[df['genre'].isin(popular_genres)]
 total_sales_by_genre = data.groupby("genre")["total_sales"].sum().sort_values(ascending=False)
 
-# 2. Regional Sales by Genre
+# Regional Sales by Genre
 regional_sales_by_genre = data.groupby("genre")[["na_sales", "jp_sales", "pal_sales", "other_sales"]].sum()
 
 # Plotting Total Sales by Genre
@@ -165,7 +163,6 @@ top_publishers_score = (
     .head(15)
 )
 
-# Plot
 plt.figure(figsize=(10, 6))
 sb.barplot(x=top_publishers_score.values, y=top_publishers_score.index, hue=top_publishers_score.index, palette="coolwarm")
 plt.title("Top 15 Publishers by Average Critic Score")
@@ -182,7 +179,6 @@ developer_sales = (
     .head(15)
 )
 
-# Plot
 plt.figure(figsize=(10, 6))
 sb.barplot(x=developer_sales.values, y=developer_sales.index, hue=developer_sales.index, palette="viridis")
 plt.title("Top 15 Developers by Average Total Sales")
@@ -195,7 +191,6 @@ plt.show()
 
 df["score_range"] = pd.cut(df["critic_score"], bins=[0, 5, 6, 7, 8, 9, 10], labels=["0-5", "5-6", "6-7", "7-8", "8-9", "9-10"])
 
-# Bar plot of average total sales by score range
 plt.figure(figsize=(10, 6))
 sb.barplot(data=df[df["score_range"].notnull() & df["total_sales"].notnull()],
             x="score_range", y="total_sales", hue="score_range", palette="magma")
@@ -206,9 +201,7 @@ plt.tight_layout()
 plt.show()
 
 # ! Objective 5
-# Ensure release_date is in datetime format
-if not pd.api.types.is_datetime64_any_dtype(df['release_date']):
-	df['release_date'] = pd.to_datetime(df['release_date'], origin='1899-12-30', unit='D')
+df['release_date'] = pd.to_datetime(df['release_date'])
 
 yearly_sales = df.groupby('release_year')['total_sales'].sum()
 plt.figure(figsize=(12, 6))
