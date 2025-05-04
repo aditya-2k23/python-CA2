@@ -58,7 +58,6 @@ outliers = (np.abs(z_scores) > 3)
 print(f"Number of outliers found: {outliers.sum()}")
 
 # ? Correlation Matrix
-
 plt.figure(figsize=(10, 8))
 correlation_matrix = df[numeric_cols].corr()
 sb.heatmap(correlation_matrix, annot=True, fmt=".2f", cmap="coolwarm", linewidths=0.5)
@@ -67,7 +66,6 @@ plt.tight_layout()
 plt.show()
 
 # ! Objective 1. Platform vs Region — Which platform performs better where? by analyzing the sales data by platform and region.
-
 # List of popular consoles
 popular_consoles = ["PS", "PS2", "PS3", "PS4", "PS5", "XONE", "X360",
                     "PC", "PSP", "Wii", "DS", "XB", "GBA", "GC", "2600", "N64"]
@@ -86,7 +84,6 @@ sb.barplot(x=region_sales.index, y=region_sales['jp_sales'], label='Japan', colo
 sb.barplot(x=region_sales.index, y=region_sales['pal_sales'], label='PAL', color='green', alpha=0.7, bottom=region_sales['na_sales'] + region_sales['jp_sales'])
 sb.barplot(x=region_sales.index, y=region_sales['other_sales'], label='Other', color='orange', alpha=0.7, bottom=region_sales['na_sales'] + region_sales['jp_sales'] + region_sales['pal_sales'])
 
-plt.xticks(rotation=45)
 plt.title('Regional Sales by Gaming Platform')
 plt.xlabel('Gaming Platform')
 plt.ylabel('Sales (in millions)')
@@ -94,7 +91,6 @@ plt.legend(title='Region')
 plt.show()
 
 # ! Objective 2: Top Genres — Who loves what genre, and where? by analyzing the sales data by genre and region.
-
 # Popular Genres
 popular_genres = ["Action", "Shooter", "Sports", "Role-Playing", "Adventure", "Platform", "Simulation", "Platform", "Racing", "Misc", "Fighting"]
 
@@ -130,7 +126,6 @@ plt.tight_layout()
 plt.show()
 
 # ! To determine which genres are most appealing to consumers and where by analyzing total and regional sales figures by game genre like Action, Shooter, Sports.
-
 # Total Sales by Genre
 data = df[df['genre'].isin(popular_genres)]
 total_sales_by_genre = data.groupby("genre")["total_sales"].sum().sort_values(ascending=False)
@@ -157,7 +152,6 @@ plt.tight_layout()
 plt.show()
 
 # ! Objective 3: To check how developers affect game sales and ratings
-
 developer_sales = (
     df.groupby("developer")["total_sales"]
     .mean()
@@ -174,12 +168,11 @@ plt.tight_layout()
 plt.show()
 
 # ! Objective 4: Critic Score vs Sales — Do reviews actually matter?
-
 df["score_range"] = pd.cut(df["critic_score"], bins=[0, 5, 6, 7, 8, 9, 10], labels=["0-5", "5-6", "6-7", "7-8", "8-9", "9-10"])
 
 plt.figure(figsize=(10, 6))
 sb.barplot(data=df[df["score_range"].notnull() & df["total_sales"].notnull()],
-            x="score_range", y="total_sales", palette="magma", errorbar=None)
+            x="score_range", y="total_sales", hue="score_range", palette="magma", errorbar=None)
 plt.title("Average Sales by Critic Score Range")
 plt.xlabel("Critic Score Range")
 plt.ylabel("Average Total Sales (in millions)")
